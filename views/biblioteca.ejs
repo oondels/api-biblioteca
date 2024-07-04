@@ -6,6 +6,20 @@
     <title>Biblioteca</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <div class="container">
+      <div class="wrapper">
+        <div class="main">
+          <h1>Livros</h1>
+          <ul>
+              <% livros.forEach(livro => { %>
+                <li>
+                  <h3>Titulo: <%= livro.titulo %></h3>
+                </li>
+              <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
   </body>
 </html>
