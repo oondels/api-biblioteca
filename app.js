@@ -1,11 +1,16 @@
 const express = require("express");
-const body = require("body-parser");
+const bodyParser  = require("body-parser");
 const bcrypt = require("bcryptjs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+const authUser = require("./auth/authUser")
 const { User, Livro, Emprestimo, Comentario } = require("./models/index");
 
 const app = express();
+
+// Configuração bodyparser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -30,15 +35,16 @@ app.post("/register-user", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login-token", async (req, res) => {
   try {
     const { email, senha } = req.body;
     const user = await User.findOne({ where: { email } });
-    const isValidPassword = bcrypt.compare(senha, user.senha);
 
     if (!user) {
       return res.status(404).json({ error: "Usuário não Encontrado!" });
     }
+
+    const isValidPassword = await bcrypt.compare(senha, user.senha);
     if (!isValidPassword) {
       return res.status(401).json({ error: "Senha Inválida" });
     }
@@ -58,7 +64,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/", async (req, res) => {
+app.get("/login", (req, res) => {
+  res.render("login")
+})
+
+app.get("/", authUser, async (req, res) => {
   let livros;
   try {
     livros = await Livro.findAll();
