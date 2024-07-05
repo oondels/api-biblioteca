@@ -1,0 +1,31 @@
+{
+  "redhat.telemetry.enabled": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "workbench.colorTheme": "Omni Owl (Minimal Italics)",
+  "editor.fontFamily": "cascadia code",
+  "editor.cursorBlinking": "expand",
+  "editor.cursorSurroundingLines": 15,
+  "editor.lineHeight": 1.8,
+  "editor.cursorSmoothCaretAnimation": "on",
+  "workbench.iconTheme": "symbols",
+  "php.validate.executablePath": "C:/Users/hendrius.santana/Documents/pip/Manual de Máquinas/code/php/php.exe",
+  "symbols.hidesExplorerArrows": false,
+  "liveServer.settings.donotShowInfoMsg": true,
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "liveServer.settings.donotVerifyTags": true,
+  "git.enableSmartCommit": true,
+  "[rust][javascript]": {
+    "editor.formatOnSave": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "markdown-pdf.executablePath": "C:\\Program Files\\Google\\Chrome\\Application"
+}

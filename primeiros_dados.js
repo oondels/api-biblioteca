@@ -1,20 +1,25 @@
 const sequelize = require("./models/sequelize");
-const User = require("./models/user");
+const Livro = require("./models/livro");
 
-const insertUser = async (nome, email, senha, admin) => {
+const insertLivro = async (titulo, genero, autor, ano) => {
   try {
-    const newUser = await User.create({
-      nome: nome,
-      email: email,
-      senha: senha,
-      admin: admin,
+    const newLivro = await Livro.create({
+      titulo: titulo,
+      genero: genero,
+      autor: autor,
+      ano: ano,
     });
 
-    console.log("Usuário Inserido com Sucesso:", newUser.toJSON());
+    console.log("Livro Inserido com Sucesso:", newLivro.toJSON());
   } catch (error) {
-    console.error("Erro ao cadastrar Usuário:", error);
+    console.error("Erro ao cadastrar Livro:", error);
   }
 };
 
-insertUser("Hendrius Félix", "hendriusfelix@gmail.com", "123", true);
-insertUser("Maria Clara", "mariaclara@gmail.com", "123");
+insertLivro(
+  "alice no pais das maravilhas",
+  "Fantasia",
+  "Robertinho alicias",
+  "1984"
+);
+insertLivro("Harry potter", "Magia", "J. K. Roling", "2000");

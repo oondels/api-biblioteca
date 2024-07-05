@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emprestimo de Livro</title>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <form action="/post-emprestimo" method="POST">
+                <input type="text" placeholder="Digite uma Data Válida">
+                <input type="number" name="dias-aluguel" id="dias-aluguel" value="2" min="2" max="30" step="1">
+                <input type="submit" value="Alugar">
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+        })
+    </script>
+</body>
+</html>
