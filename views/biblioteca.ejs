@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      #user-comentario {
+        display: flex;
+        padding: 3px;
+        border: 0.5px solid black;
+      }
+
+      #user-comentario p {
+        padding-right: 10px;
+      }
+    </style>
     <title>Biblioteca</title>
   </head>
   <body>
@@ -10,16 +21,98 @@
       <div class="wrapper">
         <div class="main">
           <h1>Livros</h1>
+          Olá <span id="nome-user"><%= user.nome %></span>
+
+          <div id="user-data" style="display: none;">
+            <span id="user-id"><%= user.id %></span>
+            <span id="user-nome"><%= user.nome %></span>
+            <span id="user-email"><%= user.email %></span>
+          </div>
+          
           <ul>
               <% livros.forEach(livro => { %>
-                <li>
-                  <h3>Titulo: <%= livro.titulo %></h3>
+                <li class="livro-item" data-livro-id="<%= livro.id %>">
+                  <div class="emprestimo">
+                    <h3>Titulo: <%= livro.titulo %></h3>
+                    <button class="emprestimoButton">Alugar Livro</button>
+                  </div>
+                  
+                  <div class="containerComentarios">
+                    <% comentarios.forEach(comentario => { %>
+                      <% if(livro.id === comentario.LivroId) { %>
+                        <p><%= comentario.User.nome %>: <%= comentario.coment %> <br>likes: <strong><%= comentario.like %></strong></p>
+                      <% } %>
+                    <% }) %>
+                  </div>
+                  <input type="text" name="comentario" id="comentario-input">
+                  <input type="submit" value="Comentar" class="comentar">
+
+                  <div class="livro-data" style="display: none;">
+                    <span id="livro-id"><%= livro.id %></span>
+                  </div>
                 </li>
               <% }) %>
           </ul>
         </div>
       </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const addComentHTML = () => {
+          const userId = document.getElementById("user-id").innerText
+          const comentarButtons = document.querySelectorAll(".comentar")
+
+          comentarButtons.forEach((button) => {
+            button.addEventListener("click", (event) => {
+              const user = document.getElementById("nome-user").innerText
+
+              // Selecionando o livro de acordo com o post do comentário
+              const livroItem = event.target.closest(".livro-item")
+              const livroId = livroItem.getAttribute("data-livro-id")
+              const comentario = livroItem.querySelector("#comentario-input")
+ 
+              const comentData = {
+                livro: livroId,
+                user: userId,
+                coment: comentario.value
+              }               
+
+                fetch("/post-coment", {
+                  method: "POST",
+                  headers: {
+                  "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(comentData)
+                }).then((response) => {
+                  if (!response.ok) {
+                    throw new Error(
+                      "Não foi possível publicar o comentario" + response.statusText
+                    )
+                  }
+                  return response.json();
+                }).then((data) => {
+                  alert("Comentário Postado")
+
+                  window.location.href = `/?userId=${userId}`
+                }).catch((error) => {
+                  console.error("Error:", error)
+                })
+            
+          })
+          });
+        }
+        addComentHTML()
+
+        const alugarButtons = document.querySelectorAll(".emprestimoButton")
+        alugarButtons.addEventListener("click", (event) => {
+          const livroItem = event.target.closest("livro-item")
+          const livroId = livroItem.getAttribute("data-livro-id")
+
+          
+        })
+      })
+    </script>
     
   </body>
 </html>

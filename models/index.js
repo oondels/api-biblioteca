@@ -3,8 +3,8 @@ const Livro = require("./livro");
 const Emprestimo = require("./emprestimo");
 const Comentario = require("./comentario");
 
-User.belongsToMany(Comentario, { through: "UserComentario" });
-Comentario.belongsToMany(User, { through: "UserComentario" });
+User.hasMany(Comentario);
+Comentario.belongsTo(User);
 
 Livro.hasMany(Comentario);
 Comentario.belongsTo(Livro);
