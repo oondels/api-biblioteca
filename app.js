@@ -1,24 +1,36 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
+const session = require("express-session");
 const path = require("path");
-const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
-const authUser = require("./auth/authUser");
 const { User, Livro, Emprestimo, Comentario } = require("./models/index");
+const sequelize = require("./models/sequelize");
 
 const app = express();
 
 // Configuração bodyparser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+
+app.use(
+  session({
+    secret: "secretKey",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false },
+  })
+);
+
+const authLogin = (req, res, next) => {
+  if (req.session.userId) {
+    next();
+  } else {
+    res.status(401).redirect("/login");
+  }
+};
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000");
-});
 
 app.get("/register", (req, res) => {
   res.render("register");
@@ -55,18 +67,9 @@ app.post("/login-token", async (req, res) => {
       return res.status(401).json({ error: "Senha Inválida" });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        admin: user.admin,
-      },
-      "secretKey",
-      { expiresIn: "1h" }
-    );
+    req.session.userId = user.id;
+    req.session.userAdmin = user.admin;
 
-    res.cookie("token", token, { httpOnly: true });
-
-    // Enviar id do usuário ao redirecionar
     res.redirect(`/?userId=${user.id}`);
   } catch (error) {
     console.error("Erro ao buscar Usuários:", error);
@@ -77,7 +80,7 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-app.get("/", authUser, async (req, res) => {
+app.get("/", authLogin, async (req, res) => {
   let livros;
   let comentarios;
   const userId = req.query.userId;
@@ -114,5 +117,48 @@ app.post("/post-coment", async (req, res) => {
 });
 
 app.get("/emprestimo", (req, res) => {
-  res.render("emprestimo");
+  const livroId = req.query.livroId;
+
+  res.render("emprestimo", { livroId });
+});
+
+app.post("/emprestimo", authLogin, async (req, res) => {
+  const { dataRetirada, diasAluguel, livroId } = req.body;
+
+  const calcDiasAluguel = (data, dias) => {
+    const partesData = data.split("/"); // Divide a string de data
+    const dataObj = new Date(partesData[2], partesData[1] - 1, partesData[0]); // Cria um objeto Date a partir das partes da data
+    dataObj.setDate(dataObj.getDate() + parseInt(dias)); // Atualiza a data com o número de dias fornecido
+
+    const dia = dataObj.getDate().toString().padStart(2, "0"); // Obtém o dia com zero à esquerda se necessário
+    const mes = (dataObj.getMonth() + 1).toString().padStart(2, "0"); // Obtém o mês com zero à esquerda se necessário
+    const ano = dataObj.getFullYear(); // Obtém o ano
+
+    return `${dia}/${mes}/${ano}`;
+  };
+
+  const dataDevolucao = calcDiasAluguel(dataRetirada, diasAluguel);
+
+  try {
+    const newEmprestimo = await Emprestimo.create({
+      dataRetirada: dataRetirada,
+      dataDevolucao: dataDevolucao,
+      UserId: req.session.userId,
+    });
+
+    // Adiciona os livros associados ao empréstimo
+    await newEmprestimo.addLivros(livroId);
+
+    res.json({ emprestimo: "Realizado com Sucesso! " });
+  } catch (error) {
+    console.error("Erro ao alugar livro:", error);
+  }
+});
+
+sequelize.sync().then(() => {
+  app.listen(3000, () => {
+    console.log(
+      "Conexão com Banco de Dados estabelecida. Servidor Rodanddo na Porta 3000"
+    );
+  });
 });

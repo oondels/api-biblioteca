@@ -105,12 +105,18 @@
         addComentHTML()
 
         const alugarButtons = document.querySelectorAll(".emprestimoButton")
-        alugarButtons.addEventListener("click", (event) => {
-          const livroItem = event.target.closest("livro-item")
-          const livroId = livroItem.getAttribute("data-livro-id")
 
-          
+        // Redirecionar para a página de emprestimo com id do Livro selecionado
+        alugarButtons.forEach(button => {
+          button.addEventListener("click", (event) => {
+            const livroItem = event.target.closest(".livro-item")
+            const livroId = livroItem.getAttribute("data-livro-id")
+            const queryString = new URLSearchParams({ livroId: livroId }).toString()
+            
+            window.location.href = `/emprestimo?${queryString}`
+          })
         })
+        
       })
     </script>
     

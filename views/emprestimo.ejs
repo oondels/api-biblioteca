@@ -8,18 +8,14 @@
 <body>
     <div class="container">
         <div class="wrapper">
-            <form action="/post-emprestimo" method="POST">
-                <input type="text" placeholder="Digite uma Data Válida">
-                <input type="number" name="dias-aluguel" id="dias-aluguel" value="2" min="2" max="30" step="1">
+            <form action="/emprestimo" method="POST">
+                <input type="text" placeholder="Digite uma Data Válida" name="dataRetirada" id="dataRetirada">
+                <input type="number" name="diasAluguel" id="diasAluguel" value="2" min="2" max="30" step="1">
                 <input type="submit" value="Alugar">
+                <input style="display: none;" type="text" value="<%= livroId %>" name="livroId">
             </form>
         </div>
     </div>
     
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            
-        })
-    </script>
 </body>
 </html>
