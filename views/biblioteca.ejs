@@ -34,7 +34,13 @@
                 <li class="livro-item" data-livro-id="<%= livro.id %>">
                   <div class="emprestimo">
                     <h3>Titulo: <%= livro.titulo %></h3>
-                    <button class="emprestimoButton">Alugar Livro</button>
+                    <% livrosEmprestados.forEach(livroEmprestado => { %>
+                      <% if (livroEmprestado.id === livro.id) { %>
+                        <h3>Livro Alugado</h3>
+                      <% } else { %>
+                        <button class="emprestimoButton">Alugar Livro</button>
+                      <% } %>
+                    <% }) %>
                   </div>
                   
                   <div class="containerComentarios">

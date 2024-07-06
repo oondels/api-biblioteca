@@ -83,6 +83,7 @@ app.get("/login", (req, res) => {
 app.get("/", authLogin, async (req, res) => {
   let livros;
   let comentarios;
+  let livrosEmprestados;
   const userId = req.query.userId;
   const user = await User.findByPk(userId);
 
@@ -92,11 +93,22 @@ app.get("/", authLogin, async (req, res) => {
     comentarios = await Comentario.findAll({
       include: User,
     });
+
+    // Pesquisa os livros emprestados
+    livrosEmprestados = await Livro.findAll({
+      include: [
+        {
+          model: Emprestimo,
+          where: { devolucao: false },
+        },
+      ],
+    });
+
     console.log("Dados Encontrados");
   } catch (error) {
     console.error("Não foi possível buscar os dados:", error);
   }
-  res.render("biblioteca", { livros, user, comentarios });
+  res.render("biblioteca", { livros, user, comentarios, livrosEmprestados });
 });
 
 app.post("/post-coment", async (req, res) => {
