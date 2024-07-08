@@ -184,6 +184,8 @@ app.post("/emprestimo", authLogin, async (req, res) => {
   }
 });
 
+app.get("devolver-livro", (req, res) => {});
+
 sequelize.sync().then(() => {
   app.listen(3000, () => {
     console.log(

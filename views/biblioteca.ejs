@@ -26,14 +26,20 @@
 
           <button id="show-livros-emprestados">Ver Livros emprestados em meu nome</button>
           <div id="livros-emprestimo-user" style="display: none;">
+            <ul>
             <% usersEmprestimos.forEach(livro => { %>
-              <ul>
                 <% livro.Livros.forEach(emprestimo => { %>
-                  <li><%= emprestimo.titulo %></li>
-                  <button>Devolver Livro</button>
+                  <li>
+                    <%= emprestimo.titulo %>
+                    <button class="devolverLivro">Devolver Livro</button>
+                    <div data-livro-id-emprestimo="<%= emprestimo.id %>" class="avaliacao-livro-<%= emprestimo.id %>">
+                      <input type="range" min="1" max="5" value="1" class="avaliacao-range">
+                      <p class=`valor-avaliacao-<%= emprestimo.id %>`></p>
+                    </div>
+                  </li>
                 <% }) %>
-              </ul>
             <% }) %>
+          </ul>
           </div>
 
           <div id="user-data" style="display: none;">
@@ -139,6 +145,43 @@
             window.location.href = `/emprestimo?${queryString}`
           })
         })
+
+        // Avaliação do usuário ao livro devolvido
+        const sliderAvaliacao = document.querySelectorAll(".avaliacao-range")
+        const valorAvaliacao = document.querySelectorAll(".valor-avaliacao")
+        const livroId = document.getAttribute("data-livro-id-emprestimo")
+        
+        // Corrigir Funcionamento do Slider
+        sliderAvaliacao.forEach(slider => {
+          valorAvaliacao.forEach(valor => {
+              slider.oninput = function () {
+                valor.textContent = slider.value
+              }
+          })
+        })
+        
+
+
+        // Redirecionar para devolução do livro
+        const buttonsDevolverLivro = document.querySelectorAll(".devolverLivro")
+        buttonsDevolverLivro.forEach(button => {
+          button.addEventListener("click", () => {
+
+          //   const devolverLivro = {
+          //     avalicao: "avaliação",
+          //     dataDevolvido: "Data Devolvido",
+          //     devolucao: true
+          //   }
+            
+          //   fetch("/devolver-livro", {
+          //         method: "POST",
+          //         headers: {
+          //         "Content-Type": "application/json",
+          //         },
+          //         body: JSON.stringify(devolverLivro)
+          // })
+        })
+      })
 
         // Mostrar livros emprestados
         const showLivros = document.getElementById("show-livros-emprestados")
