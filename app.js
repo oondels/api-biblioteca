@@ -80,7 +80,7 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-app.get("/", authLogin, async (req, res) => {
+app.get("/", async (req, res) => {
   let livros;
   let comentarios;
   let livrosEmprestados;
@@ -89,7 +89,7 @@ app.get("/", authLogin, async (req, res) => {
 
   try {
     livros = await Livro.findAll();
-    //  busque dados relacionados de Use ao mesmo tempo que Livros
+    //  busque dados relacionados de User ao mesmo tempo que Livros
     comentarios = await Comentario.findAll({
       include: User,
     });
@@ -104,11 +104,28 @@ app.get("/", authLogin, async (req, res) => {
       ],
     });
 
+    // Pesquisa os livros emprestados
+    const usersEmprestimos = await Emprestimo.findAll({
+      where: { UserId: userId, devolucao: false },
+      include: [
+        {
+          model: Livro,
+        },
+      ],
+    });
+
     console.log("Dados Encontrados");
+
+    res.render("biblioteca", {
+      livros,
+      user,
+      comentarios,
+      livrosEmprestados,
+      usersEmprestimos,
+    });
   } catch (error) {
     console.error("Não foi possível buscar os dados:", error);
   }
-  res.render("biblioteca", { livros, user, comentarios, livrosEmprestados });
 });
 
 app.post("/post-coment", async (req, res) => {

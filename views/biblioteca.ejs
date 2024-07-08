@@ -6,12 +6,13 @@
     <style>
       #user-comentario {
         display: flex;
-        padding: 3px;
         border: 0.5px solid black;
       }
 
       #user-comentario p {
+        padding: 3px;
         padding-right: 10px;
+        margin: 0;
       }
     </style>
     <title>Biblioteca</title>
@@ -23,7 +24,17 @@
           <h1>Livros</h1>
           Olá <span id="nome-user"><%= user.nome %></span>
 
-          <button>Ver Livros emprestados em meu nome</button>
+          <button id="show-livros-emprestados">Ver Livros emprestados em meu nome</button>
+          <div id="livros-emprestimo-user" style="display: none;">
+            <% usersEmprestimos.forEach(livro => { %>
+              <ul>
+                <% livro.Livros.forEach(emprestimo => { %>
+                  <li><%= emprestimo.titulo %></li>
+                  <button>Devolver Livro</button>
+                <% }) %>
+              </ul>
+            <% }) %>
+          </div>
 
           <div id="user-data" style="display: none;">
             <span id="user-id"><%= user.id %></span>
@@ -36,19 +47,23 @@
                 <li class="livro-item" data-livro-id="<%= livro.id %>">
                   <div class="emprestimo">
                     <h3>Titulo: <%= livro.titulo %></h3>
-                    <% livrosEmprestados.forEach(livroEmprestado => { %>
-                      <% if (livroEmprestado.id === livro.id) { %>
-                        <h3>Livro Alugado</h3>
-                      <% } else { %>
-                        <button class="emprestimoButton">Alugar Livro</button>
-                      <% } %>
-                    <% }) %>
+                    <% 
+                      const livroEmprestado = livrosEmprestados.find(livroEmp => livroEmp.id === livro.id);
+                      if (livroEmprestado) { 
+                    %>
+                      <h2>Livro Alugado</h2>
+                    <% } else { %>
+                      <button class="emprestimoButton">Alugar Livro</button>
+                    <% } %>
                   </div>
                   
                   <div class="containerComentarios">
                     <% comentarios.forEach(comentario => { %>
                       <% if(livro.id === comentario.LivroId) { %>
-                        <p><%= comentario.User.nome %>: <%= comentario.coment %> <br>likes: <strong><%= comentario.like %></strong></p>
+                        <div id="user-comentario">
+                          <p><%= comentario.User.nome %>: <%= comentario.coment %></p>
+                        </div>
+                        <p>likes: <strong><%= comentario.like %></strong></p>
                       <% } %>
                     <% }) %>
                   </div>
@@ -123,6 +138,17 @@
             
             window.location.href = `/emprestimo?${queryString}`
           })
+        })
+
+        // Mostrar livros emprestados
+        const showLivros = document.getElementById("show-livros-emprestados")
+        const livroContainer = document.getElementById("livros-emprestimo-user")
+        showLivros.addEventListener("click", () => {
+          if (livroContainer.style.display === "none") {
+            livroContainer.style.display = "block"
+          } else {
+            livroContainer.style.display = "none"
+          }
         })
         
       })
