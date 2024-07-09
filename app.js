@@ -114,6 +114,11 @@ app.get("/", async (req, res) => {
       ],
     });
 
+    // Convertendo o objeto do Sequelize para JSON
+    const usersEmprestimosJSON = usersEmprestimos.map((emprestimo) =>
+      emprestimo.toJSON()
+    );
+
     console.log("Dados Encontrados");
 
     res.render("biblioteca", {
@@ -121,7 +126,7 @@ app.get("/", async (req, res) => {
       user,
       comentarios,
       livrosEmprestados,
-      usersEmprestimos,
+      usersEmprestimos: usersEmprestimosJSON,
     });
   } catch (error) {
     console.error("Não foi possível buscar os dados:", error);
@@ -145,7 +150,7 @@ app.post("/post-coment", async (req, res) => {
   res.json(comentData);
 });
 
-app.get("/emprestimo", (req, res) => {
+app.get("/emprestimo", authLogin, (req, res) => {
   const livroId = req.query.livroId;
 
   res.render("emprestimo", { livroId });
@@ -153,38 +158,50 @@ app.get("/emprestimo", (req, res) => {
 
 app.post("/emprestimo", authLogin, async (req, res) => {
   const { dataRetirada, diasAluguel, livroId } = req.body;
+  const userId = req.session.userId;
 
   const calcDiasAluguel = (data, dias) => {
     const partesData = data.split("/"); // Divide a string de data
     const dataObj = new Date(partesData[2], partesData[1] - 1, partesData[0]); // Cria um objeto Date a partir das partes da data
     dataObj.setDate(dataObj.getDate() + parseInt(dias)); // Atualiza a data com o número de dias fornecido
 
-    const dia = dataObj.getDate().toString().padStart(2, "0"); // Obtém o dia com zero à esquerda se necessário
-    const mes = (dataObj.getMonth() + 1).toString().padStart(2, "0"); // Obtém o mês com zero à esquerda se necessário
-    const ano = dataObj.getFullYear(); // Obtém o ano
-
-    return `${dia}/${mes}/${ano}`;
+    return dataObj.toISOString();
   };
 
   const dataDevolucao = calcDiasAluguel(dataRetirada, diasAluguel);
-
+  console.log(dataDevolucao);
   try {
     const newEmprestimo = await Emprestimo.create({
       dataRetirada: dataRetirada,
       dataDevolucao: dataDevolucao,
       UserId: req.session.userId,
     });
-
     // Adiciona os livros associados ao empréstimo
     await newEmprestimo.addLivros(livroId);
-
-    res.json({ emprestimo: "Realizado com Sucesso! " });
+    res
+      .redirect(`/?userId=${userId}`)
+      .json({ emprestimo: "Realizado com Sucesso! " });
   } catch (error) {
     console.error("Erro ao alugar livro:", error);
   }
 });
 
-app.get("devolver-livro", (req, res) => {});
+app.post("/devolver-livro", async (req, res) => {
+  const devolverData = req.body;
+
+  const emprestimo = await Emprestimo.findByPk(devolverData.emprestimoId);
+  if (emprestimo) {
+    emprestimo.devolucao = devolverData.devolucao;
+    emprestimo.dataDevolvido = devolverData.dataDevolvido;
+    emprestimo.avaliacao = devolverData.avaliacao;
+
+    await emprestimo.save();
+    console.log("Livro devolvido:", emprestimo.toJSON());
+  } else {
+    console.log("Livro não encontrado");
+  }
+  res.status(200).json({ message: "Livro devolvido com successo!" });
+});
 
 sequelize.sync().then(() => {
   app.listen(3000, () => {
