@@ -168,6 +168,10 @@ app.post("/post-like", async (req, res) => {
   res.json({ status: "Like Adicionado" });
 });
 
+app.get("/cadastro-livro", (req, res) => {
+  res.render("cadastroLivro");
+});
+
 app.get("/emprestimo", authLogin, (req, res) => {
   const livroId = req.query.livroId;
 
