@@ -54,6 +54,21 @@
                 <li class="livro-item" data-livro-id="<%= livro.id %>">
                   <div class="emprestimo">
                     <h3>Titulo: <%= livro.titulo %></h3>
+                    <%
+                      let qntAvaliacao = 0
+                      let somaAvaliacao = 0
+                      if (livro.Emprestimos) {
+                        livro.Emprestimos.forEach(emprestimo => {
+                          if (emprestimo.devolucao === true && emprestimo.avaliacao !== undefined) {
+                            somaAvaliacao += emprestimo.avaliacao;
+                            qntAvaliacao ++;
+                          }
+                        })
+                      }
+                    %>
+                    <p><span>Média de Avaliação: <%= somaAvaliacao/qntAvaliacao %></span></p>
+                    <p><span>Quantidade de avaliações: <%= qntAvaliacao %></span></p>
+
                     <% 
                       const livroEmprestado = livrosEmprestados.find(livroEmp => livroEmp.id === livro.id);
                       if (livroEmprestado) { 
@@ -68,7 +83,7 @@
                     <% comentarios.forEach(comentario => { %>
                       <% if(livro.id === comentario.LivroId) { %>
                         <div id="user-comentario">
-                          <p><%= comentario.User.nome %>: <%= comentario.coment %></p>
+                          <p><%= comentario.User.nome %>: <%= comentario.coment %></p> <button class="Like-Buttão">Like</button>
                         </div>
                         <p>likes: <strong><%= comentario.like %></strong></p>
                       <% } %>

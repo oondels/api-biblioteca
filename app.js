@@ -88,7 +88,11 @@ app.get("/", async (req, res) => {
   const user = await User.findByPk(userId);
 
   try {
-    livros = await Livro.findAll();
+    livros = await Livro.findAll({
+      include: {
+        model: Emprestimo,
+      },
+    });
     //  busque dados relacionados de User ao mesmo tempo que Livros
     comentarios = await Comentario.findAll({
       include: User,
