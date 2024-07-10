@@ -83,9 +83,11 @@
                     <% comentarios.forEach(comentario => { %>
                       <% if(livro.id === comentario.LivroId) { %>
                         <div id="user-comentario">
-                          <p><%= comentario.User.nome %>: <%= comentario.coment %></p> <button class="Like-Buttão">Like</button>
+                          <p><%= comentario.User.nome %>: <%= comentario.coment %></p> 
+                          <button class="Like-Buttão" data-comentario="<%= comentario.id %>">Like</button>
+                          <div class="likes"><p>likes: <strong><%= comentario.like %></strong></p></div>
                         </div>
-                        <p>likes: <strong><%= comentario.like %></strong></p>
+                        
                       <% } %>
                     <% }) %>
                   </div>
@@ -103,9 +105,9 @@
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {        
+      document.addEventListener("DOMContentLoaded", () => {   
+        const userId = document.getElementById("user-id").innerText     
         const addComentHTML = () => {
-          const userId = document.getElementById("user-id").innerText
           const comentarButtons = document.querySelectorAll(".comentar")
 
           comentarButtons.forEach((button) => {
@@ -148,6 +150,35 @@
           });
         }
         addComentHTML()
+
+        // Contabilizar likes de comentários
+        const buttonsLike = document.querySelectorAll(".Like-Buttão")
+        buttonsLike.forEach(buttonLike => {
+          buttonLike.addEventListener("click", event => {
+             const comentarioId = buttonLike.getAttribute("data-comentario")
+             const likeData = {
+              comentarioId: comentarioId,
+              userId: userId,
+             }
+
+             fetch("/post-like", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(likeData)
+             }).then(response => {
+              if (!response.ok) {
+                throw new Error("Não foi possível atualizar a quantidade de Likes" + response.statusText)
+              }
+              return response.json();
+             }).then(data => {
+              alert("Like adicionado")
+
+              window.location.href = `/?userId=${userId}`
+             })
+          })
+        })
 
         const alugarButtons = document.querySelectorAll(".emprestimoButton")
 
@@ -213,7 +244,7 @@
                     "Content-Type": "application/json",
                     },
                     body: JSON.stringify(devolverLivro)
-              }).then((response) => {
+                 }).then((response) => {
                   if (!response.ok) {
                     throw new Error(
                       "Não foi possível devolver o livro" + response.statusText

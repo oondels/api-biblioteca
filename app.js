@@ -154,6 +154,20 @@ app.post("/post-coment", async (req, res) => {
   res.json(comentData);
 });
 
+app.post("/post-like", async (req, res) => {
+  const likeData = req.body;
+  const comentario = await Comentario.findByPk(likeData.comentarioId);
+
+  if (comentario) {
+    comentario.like += 1;
+    await comentario.save();
+  } else {
+    console.log("Comentario nao encontrado");
+  }
+
+  res.json({ status: "Like Adicionado" });
+});
+
 app.get("/emprestimo", authLogin, (req, res) => {
   const livroId = req.query.livroId;
 
