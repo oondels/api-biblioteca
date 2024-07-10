@@ -27,19 +27,23 @@
           <button id="show-livros-emprestados">Ver Livros emprestados em meu nome</button>
           <div id="livros-emprestimo-user" style="display: none;">
             <ul>
-            <% usersEmprestimos.forEach(emprestimo => { %>
-                <% emprestimo.Livros.forEach(livro => { %>
-                  <li>
-                    <%= livro.titulo %>
-                    <button class="devolverLivro">Devolver Livro</button>
-                    <div style="display: none;" data-emprestimo-id="<%= emprestimo.id %>" data-livro-id-emprestimo="<%= livro.id %>" class="avaliacao-livro">
-                      <input type="range" min="1" max="5" value="1" class="avaliacao-range">
-                      <p class="valor-avaliacao"></p>
-                      <button class="enviar-nota">Devolver</button>
-                    </div>
-                  </li>
+              <% if (!usersEmprestimos || usersEmprestimos.length === 0) { %>
+                <li>Sem livros alugados em seu nome</li>
+              <% } else { %>
+                <% usersEmprestimos.forEach(emprestimo => { %>
+                  <% emprestimo.Livros.forEach(livro => { %>
+                    <li>
+                      <%= livro.titulo %>
+                      <button class="devolverLivro">Devolver Livro</button>
+                      <div style="display: none;" data-emprestimo-id="<%= emprestimo.id %>" data-livro-id-emprestimo="<%= livro.id %>" class="avaliacao-livro">
+                        <input type="range" min="1" max="5" value="1" class="avaliacao-range">
+                        <p class="valor-avaliacao"></p>
+                        <button class="enviar-nota">Devolver</button>
+                      </div>
+                    </li>
+                  <% }) %>
                 <% }) %>
-            <% }) %>
+              <% } %>
           </ul>
           </div>
 
@@ -193,6 +197,16 @@
           })
         })        
 
+        // Mostrar livros emprestados
+        const showLivros = document.getElementById("show-livros-emprestados")
+        const livroContainer = document.getElementById("livros-emprestimo-user")
+        showLivros.addEventListener("click", () => {
+          if (livroContainer.style.display === "none") {
+            livroContainer.style.display = "block"
+          } else {
+            livroContainer.style.display = "none"
+          }
+        })
 
         // Redirecionar para devolução do livro
         const buttonsDevolverLivro = document.querySelectorAll(".devolverLivro")
@@ -262,17 +276,6 @@
 
             })  
           })  
-        })
-
-        // Mostrar livros emprestados
-        const showLivros = document.getElementById("show-livros-emprestados")
-        const livroContainer = document.getElementById("livros-emprestimo-user")
-        showLivros.addEventListener("click", () => {
-          if (livroContainer.style.display === "none") {
-            livroContainer.style.display = "block"
-          } else {
-            livroContainer.style.display = "none"
-          }
         })
         
       })
